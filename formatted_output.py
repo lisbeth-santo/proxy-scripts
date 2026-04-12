@@ -4,6 +4,8 @@ from mitmproxy import http
 
 BINARY_SIZE_LIMIT = 10_240  # 10KB
 
+media_content = ("audio/", "image/", "video/")
+
 def is_binary_body(body: bytes) -> bool:
     if not body:
         return False
@@ -22,7 +24,10 @@ def should_skip(flow) -> bool:
     if "googlevideo.com/videoplayback" in url:
         return True
     content_type = flow.request.headers.get("content-type", "")
-    if any(content_type.startswith(prefix) for prefix in ("audio/", "image/", "video/")):
+    if any(content_type.startswith(prefix) for prefix in media_content):
+        return True
+    content_type = flow.response.headers.get("content-type", "")
+    if any(content_type.startswith(prefix) for prefix in media_content):
         return True
     body = flow.request.content or b""
     if is_binary_body(body) and len(body) > BINARY_SIZE_LIMIT:
@@ -36,10 +41,13 @@ def response(flow: http.HTTPFlow):
     with open("output.csv", "a", newline="") as f:
         writer = csv.writer(f)
         if not file_exists:
-            writer.writerow(["Method", "URL", "Status", "Body"])
+            writer.writerow(["Method", "ClientIP", "Domain", "Path", "Status", "Body"])
+        client_ip = flow.client_conn.peername[0] if flow.client_conn.peername else ""
         writer.writerow([
             flow.request.method,
-            flow.request.pretty_url,
+            client_ip,
+            flow.request.host,
+            flow.request.path,
             flow.response.status_code,
             flow.request.get_text(strict=False)
         ])
