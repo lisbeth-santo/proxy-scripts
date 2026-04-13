@@ -143,7 +143,8 @@ def response(flow: http.HTTPFlow):
     }
 
     line = json.dumps({
-        "domain": flow.request.host,
+        # "domain": flow.request.host,
+        "domain": flow.client_conn.sni,
         "path":   flow.request.path,
         "body":   body,
     }, ensure_ascii=False)
