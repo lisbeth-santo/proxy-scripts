@@ -14,6 +14,7 @@ BATCH_MAX_SIZE       = 150   # flush when this many entries are queued
 BATCH_INTERVAL_SEC   = 5     # flush at least every N seconds
 
 BINARY_SIZE_LIMIT    = 10_240  # 10 KB
+MAX_BODY_SIZE        = 10_240  # skip requests with body larger than 10 KB
 MEDIA_CONTENT        = ("audio/", "image/", "video/")
 
 # ---------------------------------------------------------------------------
@@ -131,22 +132,23 @@ def response(flow: http.HTTPFlow):
     method     = flow.request.method
     status     = str(flow.response.status_code)
 
-    # Low-cardinality fields → Loki labels (used for filtering/indexing)
+    body = flow.request.get_text(strict=False)
+    if body and len(body) > MAX_BODY_SIZE:
+        return
+
     labels = {
         "app":    "mitmproxy",
         "method": method,
         "status": status,
     }
 
-    # High-cardinality fields → JSON log line
     line = json.dumps({
-        "Domain": flow.request.host,
-        "Path":   flow.request.path,
-        "Body":   flow.request.get_text(strict=False),
+        "domain": flow.request.host,
+        "path":   flow.request.path,
+        "body":   body,
     }, ensure_ascii=False)
 
-    # ClientIP → structured metadata: indexed without creating new streams
-    metadata = {"ClientIP": client_ip}
+    metadata = {"client_ip": client_ip}
 
     _enqueue(labels, line, metadata)
 
