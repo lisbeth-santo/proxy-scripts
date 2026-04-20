@@ -5,7 +5,8 @@ SNIPPET = """
     <script>
       H.init("1", {
         environment: "prod",
-        backendUrl: "https://SERVER/public",
+        privacySetting: 'none',
+        backendUrl: "https://gaamsihei.io/public",
         networkRecording: {
           enabled: false,
         },
@@ -17,13 +18,13 @@ def response(flow: http.HTTPFlow):
     if "text/html" in flow.response.headers.get("Content-Type", ""):
         flow.response.decode()
 
-        # # 2. Kill Security Policies
-        # flow.response.headers.pop("Content-Security-Policy", None)
-        # flow.response.headers.pop("Content-Security-Policy-Report-Only", None)
-        # flow.response.headers.pop("Strict-Transport-Security", None)
-        #
-        # # 3. Strip Integrity Checks (SRI)
-        # flow.response.text = flow.response.text.replace("integrity=", "data-shmintegrity=")
+        # 2. Kill Security Policies
+        flow.response.headers.pop("Content-Security-Policy", None)
+        flow.response.headers.pop("Content-Security-Policy-Report-Only", None)
+        flow.response.headers.pop("Strict-Transport-Security", None)
+        
+        # 3. Strip Integrity Checks (SRI)
+        flow.response.text = flow.response.text.replace("integrity=", "data-shmintegrity=")
 
         # 4. Inject Highlight.io
         if "<head>" in flow.response.text:
