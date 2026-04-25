@@ -1,4 +1,5 @@
 from mitmproxy import dns
+from cached_public_ip import get_public_ip, ip_to_bytes
 
 def dns_request(flow: dns.DNSFlow):
     request = flow.request
@@ -30,7 +31,7 @@ def dns_request(flow: dns.DNSFlow):
                     class_=dns.classes.IN,
                     ttl=60,
                     # IP in hex
-                    data=b"\xc0\xa8\x01\x00",
+                    data=ip_to_bytes(get_public_ip()),
                 )
             ],
 

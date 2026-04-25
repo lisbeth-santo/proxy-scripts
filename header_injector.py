@@ -11,6 +11,15 @@ SNIPPET = """
         networkRecording: {
           enabled: false,
         },
+        enableBackendTracing: false, 
+        otel: {
+          instrumentations: {
+            '@opentelemetry/instrumentation-user-interaction': false,
+            '@opentelemetry/instrumentation-document-load': false,
+            '@opentelemetry/instrumentation-xml-http-request': false,
+            '@opentelemetry/instrumentation-fetch': false,
+          }
+        },
       });
     </script>
 """

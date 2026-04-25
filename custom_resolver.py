@@ -1,4 +1,5 @@
 from mitmproxy import dns
+from cached_public_ip import get_public_ip
 import mitmproxy.http
 
 class DNSModifier:
@@ -12,7 +13,7 @@ class DNSModifier:
                         type=dns.Type.A,
                         class_=dns.Class.IN,
                         ttl=604800,
-                        data="YOUR_IP_SERVICE"
+                        data=get_public_ip()
                     )
                 ]
             )
