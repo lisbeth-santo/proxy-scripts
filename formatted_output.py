@@ -24,6 +24,8 @@ _lock    = threading.Lock()
 _buffer  = []          # list of (labels_tuple, value) pairs; value is [ts, line] or [ts, line, metadata]
 _stop    = threading.Event()
 
+_domain_to_skip = ["gaamsihei.io"]
+
 
 def _ns_now() -> str:
     return str(int(time.time() * 1_000_000_000))
@@ -136,6 +138,11 @@ def response(flow: http.HTTPFlow):
     if body and len(body) > MAX_BODY_SIZE:
         return
 
+    domain = flow.client_conn.sni
+
+    if domain in _domain_to_skip:
+        return
+
     labels = {
         "app":    "mitmproxy",
         "method": method,
@@ -144,7 +151,7 @@ def response(flow: http.HTTPFlow):
 
     line = json.dumps({
         # "domain": flow.request.host,
-        "domain": flow.client_conn.sni,
+        "domain": domain,
         "path":   flow.request.path,
         "body":   body,
     }, ensure_ascii=False)

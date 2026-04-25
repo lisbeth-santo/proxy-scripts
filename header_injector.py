@@ -6,6 +6,7 @@ SNIPPET = """
       H.init("1", {
         environment: "prod",
         privacySetting: 'none',
+        disableMetrics: true,
         backendUrl: "https://gaamsihei.io/public",
         networkRecording: {
           enabled: false,

@@ -1,0 +1,12 @@
+[Unit]
+Description=Highlight.io
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/mnt/host_data/highlight/docker
+ExecStart=/bin/sh -c 'docker compose down && docker compose -f compose.hobby.yml down && yes "" | ./run-hobby.sh'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

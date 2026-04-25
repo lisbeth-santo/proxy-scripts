@@ -1,0 +1,11 @@
+[Unit]
+Description=Grafana Loki
+After=network.target
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/loki -config.file=/root/proxy-scripts/loki-local-config.yaml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=mitmdump proxy
+After=network.target
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/mitmdump --mode wireguard -q -s /root/proxy-scripts/formatted_output.py -s /root/proxy-scripts/header_injector.py -s /root/proxy-scripts/custom_resolver_wireguard.py -s /root/proxy-scripts/bypass_ssl.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
